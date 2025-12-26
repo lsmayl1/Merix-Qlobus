@@ -1,0 +1,78 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"); */
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/fonts/Inter/static/Inter_18pt-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@theme {
+  --color-MaingBg: #f4f6fa;
+  --color-headerBg: #0e0e10;
+  --color-mainBorder: #e6e6e6;
+  --color-mainText: #717171;
+  --breakpoint-mm: 375px;
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --text-md: 1rem;
+  --text-flg: 0.9rem;
+  --text-fsm: 0.6rem;
+  --text-fxs: 0.45rem;
+}
+body {
+  font-family: "Inter";
+}
+
+input,
+button,
+textarea:focus {
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+tr {
+  cursor: pointer;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera için spin butonlarını kaldır */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Webkit browsers (Chrome, Safari, newer Edge) */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #949596;
+  border-radius: 10px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #e5e7eb;
+}
+
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+}

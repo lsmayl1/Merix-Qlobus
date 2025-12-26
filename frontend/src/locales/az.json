@@ -1,0 +1,100 @@
+{
+  "search":"Axtar",
+  "dashboard": "Əsas",
+  "products":"Məhsullar",
+  "reports":"Hesabatlar",
+  "saleReport":"Satış Hesabatı",
+  "productReport":"Məhsul Hesabatı",
+  "cashMovement":"Kassa Əməliyyatları",
+
+  "pos":"Kassa",
+
+  "revenue":"Dövriyyə",
+  "todayRevenue":"Bu Günün Dövriyyəsi",
+  "todayIncome":"Bu Günün Gəliri",
+  "todayExpense":"Bu Günün Xərci",
+  "todayTotal":"Bu Günün Cəmi",
+  "profit":"Qazanc",
+  "sale":"Satış",
+  "stockCost":"Anbar Dəyəri",
+  "profitMargin" :"Gəlir Marjası",
+   "quantitySold": "Satılan Miqdar",
+
+  "bestSellingProduct":"Ən Çox Satılan Məhsullar",
+  "lowStock":"Aşağı Qalıq",
+
+  "totalProduct":"Ümumi Məhsullar",
+  "WeightBasedProducts":"Çəki Əsaslı Məhsullar",
+  "UnitBasedProducts":"Ədəd Əsaslı Məhsullar",
+  "OutofStockProducts":"Qalığı Olmayan Məhsullar",
+
+   "Searchbynameorbarcode":"Ad və ya barkod ilə axtar",
+   "filters":"Filtrlər",
+   "addProduct":"Məhsul Əlavə Et",
+   "add":"Əlavə Et",
+   
+
+
+   
+  "product": "Məhsul",
+  "barcode": "Barkod",
+  "unit": "Vahid",
+  "piece":"Ədəd",
+  "price":"Qiymət",
+  "buyPrice": "Alış qiyməti",
+  "sellPrice": "Satış qiyməti",
+  "stock": "Qalıq",
+  "addStock" :"Qalıq Artir",
+  "quantity":"Miqdar",
+  "editDelete": "Redaktə/Silmə",
+  "subtotal":"Məbləğ",
+  "amount": "Məbləğ",
+  "total":"Cəmi",
+  "delete":"Sil",
+  "clearAll":"Təmizlə",
+  "empty":"Boş",
+  "type":"Əməliyyat",
+  "income":"Gəlir",
+  "expense":"Xərc",
+  "date":"Tarix",
+  "description": "Təsvir",
+   "today": "Bugün",
+  "yesterday": "Dünən",
+  "thisWeek": "Bu Həftə",
+  "lastWeek": "Ötən Həftə",
+  "thisMonth": "Bu Ay",
+  "lastMonth": "Ötən Ay",
+  "thisYear": "Bu İl",
+
+   "saleAmount": "Satış Məbləği",
+  "paymentMethod": "Ödəmə üsulu",
+  "details": "Ətraflı",
+  "purchase": "Alım",
+  "payment": "Ödəniş",
+
+  
+  "cash":"Nağd",
+  "card":"Kart",
+  "credit":"Nisiyə",
+  "receivedAmount": "Qəbul olunan məbləğ",
+  "amountToReturn": "Qaytarılacaq məbləğ",
+
+  "makePayment":"Ödəniş et",
+
+  "name":"Ad",
+  "cancel":"Ləğv Et",
+  "update":"Dəyiş",
+  "create":"Yarat",
+
+  "createTransaction":"Əməliyyat Yarat",
+
+  "stockMovements": "Anbar Hərəkətləri",
+  "hourly": "Saatlıq",
+  "daily": "Gündəlik",
+  "weekly": "Həftəlik",
+  "monthly": "Aylıq",
+  "return": "Qaytarma",
+
+  "supplier": "Təchizatçılar"
+
+}

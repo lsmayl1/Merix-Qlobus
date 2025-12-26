@@ -1,0 +1,91 @@
+{
+  "search":"search",
+  "dashboard": "Dashboard",
+  "products" :"Products",
+  "reports":"Reports",
+  "saleReport":"Sale Reports",
+  "productReport":"Products Reports",
+  "cashMovement":"Cash Movement",
+  "pos":"POS",
+
+  "revenue":"Revenue",
+  "todayRevenue":"Today Revenue",
+  "todayIncome":"Today Income",
+  "todayExpense":"Today Expense",
+  "todayTotal":"Today Total",
+  "profit":"Profit",
+  "sale":"Sale",
+  "stockCost":"Stock Cost",
+  "profitMargin":"Profit Margin",
+   "quantitySold": "Quantity Sold",
+
+  "bestSellingProduct":"Best Selling Products",
+  "lowStock":"Low Stock",
+
+  "totalProduct":"Total Products",
+  "WeightBasedProducts":"Weight-Based Products",
+  "UnitBasedProducts":"Unit-Based Products",
+  "OutofStockProducts":"Out of Stock Products",
+
+  "Searchbynameorbarcode":"Search by name or barcode",
+  "filters":"filters",
+  "addProduct":"Add Product",
+  "add":"Add",
+
+  "product":"Product",
+  "barcode":"barcode",
+  "unit":"Unit",
+  "piece":"Piece",
+  "price":"Price",
+  "buyPrice":"Buy Price",
+  "sellPrice":"Sell Price",
+  "stock":"Stock",
+  "addStock":"Add Stock", 
+  "quantitiy":"Quantity",
+  "editDelete":"Edit/Delete",
+  "subtotal":"Subtotal",
+  "total" :"Total",
+  "delete":"delete",
+"clearAll":"Clear All",
+"empty":"Empty",
+"type":"Type",
+  "income":"Income",
+  "expense":"Expense",
+  "date":"Date",
+  "description": "Description",
+    "today": "Today",
+  "yesterday": "Yesterday",
+  "thisWeek": "This Week",
+  "lastWeek": "Last Week",
+  "thisMonth": "This Month",
+  "lastMonth": "Last Month",
+  "thisYear": "This Year",
+
+  "saleAmount":"Sale Amount",
+  "paymentMethod":"Payment Method",
+  "details":"Details",
+
+  "cash":"Cash",
+  "card":"Card",
+
+    "receivedAmount": "Received Amount",
+  "amountToReturn": "Amount to Return",
+
+  "makePayment":"Make Payment",
+  "name":"Nme",
+  "createTransaction":"Create Transaction",
+  "cancel":"Cancel",
+  "update":"Update",
+  "create":"Create",
+
+  "stockMovements": "Stock Movements",
+
+  "supplier": "Supplier"
+
+
+
+
+
+
+
+}
