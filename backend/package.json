@@ -21,6 +21,7 @@
     "cross-env": "^10.0.0",
     "csv-parser": "^3.2.0",
     "dotenv": "^16.6.1",
+    "erp-electron": "file:..",
     "escpos": "^3.0.0-alpha.6",
     "escpos-usb": "^3.0.0-alpha.4",
     "express": "^4.21.2",

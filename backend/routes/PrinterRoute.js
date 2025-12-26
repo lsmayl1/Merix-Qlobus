@@ -120,43 +120,43 @@ router.post("/label-print", async (req, res) => {
     doc.pipe(stream);
     doc.end();
 
-    // stream.on("finish", async () => {
-    //   try {
-    //     // Print using pdf-to-printer with exact size settings
-    //     const options = {
-    //       printer: "Xprinter XP-350B", // Your thermal printer
-    //       pages: "1",
-    //       orientation: "landscape",
-    //       scale: "noscale", // Critical: No scaling
-    //       monochrome: false,
-    //       silent: true,
-    //       printDialog: false,
-    //       copies: 1,
-    //       // For thermal printers, these are the key settings:
-    //       paperSize: "Custom", // Use custom paper size
-    //       fit: "actualsize", // Print at actual PDF size
-    //     };
+    stream.on("finish", async () => {
+      try {
+        // Print using pdf-to-printer with exact size settings
+        const options = {
+          printer: "Xprinter XP-350B", // Your thermal printer
+          pages: "1",
+          orientation: "landscape",
+          scale: "noscale", // Critical: No scaling
+          monochrome: false,
+          silent: true,
+          printDialog: false,
+          copies: 1,
+          // For thermal printers, these are the key settings:
+          paperSize: "Custom", // Use custom paper size
+          fit: "actualsize", // Print at actual PDF size
+        };
 
-    //     console.log("Printing with options:", options);
-    //     await pdf2printer.print(tempPath, options);
+        console.log("Printing with options:", options);
+        await pdf2printer.print(tempPath, options);
 
-    //     // Clean up temp file
-    //     // fs.unlinkSync(tempPath);
+        // Clean up temp file
+        // fs.unlinkSync(tempPath);
 
-    //     console.log("PDF printed successfully");
-    //     res.json({ success: true, message: "PDF printed successfully" });
-    //   } catch (printError) {
-    //     console.error("Print error:", printError);
-    //     // Clean up temp file even on error
-    //     if (fs.existsSync(tempPath)) {
-    //       fs.unlinkSync(tempPath);
-    //     }
-    //     res.status(500).json({
-    //       error: "Print failed",
-    //       details: printError.message,
-    //     });
-    //   }
-    // });
+        console.log("PDF printed successfully");
+        res.json({ success: true, message: "PDF printed successfully" });
+      } catch (printError) {
+        console.error("Print error:", printError);
+        // Clean up temp file even on error
+        if (fs.existsSync(tempPath)) {
+          fs.unlinkSync(tempPath);
+        }
+        res.status(500).json({
+          error: "Print failed",
+          details: printError.message,
+        });
+      }
+    });
 
     stream.on("error", (streamError) => {
       console.error("PDF creation error:", streamError);
@@ -371,37 +371,37 @@ router.get("/sale-receipt/:id", async (req, res, next) => {
     doc.pipe(stream);
     doc.end();
 
-    // stream.on("finish", async () => {
-    //   try {
-    //     // Print using pdf-to-printer
+    stream.on("finish", async () => {
+      try {
+        // Print using pdf-to-printer
 
-    //     const options = {
-    //       printer: "XP-80C", // kendi yazıcınızın adı
-    //       pages: "1",
-    //       orientation: "portrait", // fiş yatay
-    //       scale: "noscale", // Ölçeklendirme
-    //       monochrome: false,
-    //       silent: true,
-    //       printDialog: false,
-    //       copies: 1,
-    //       paperSize: "Custom",
-    //       fit: "actualsize",
-    //     };
+        const options = {
+          printer: "XP-80C", // kendi yazıcınızın adı
+          pages: "1",
+          orientation: "portrait", // fiş yatay
+          scale: "noscale", // Ölçeklendirme
+          monochrome: false,
+          silent: true,
+          printDialog: false,
+          copies: 1,
+          paperSize: "Custom",
+          fit: "actualsize",
+        };
 
-    //     await pdf2printer.print(tempPath, options);
+        await pdf2printer.print(tempPath, options);
 
-    //     // Temizle
-    //     fs.unlinkSync(tempPath);
+        // Temizle
+        fs.unlinkSync(tempPath);
 
-    //     res.json({ success: true, message: "Fiş yazıcıya gönderildi" });
-    //   } catch (printError) {
-    //     if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-    //     res.status(500).json({
-    //       error: "Yazdırma başarısız",
-    //       details: printError.message,
-    //     });
-    //   }
-    // });
+        res.json({ success: true, message: "Fiş yazıcıya gönderildi" });
+      } catch (printError) {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+        res.status(500).json({
+          error: "Yazdırma başarısız",
+          details: printError.message,
+        });
+      }
+    });
 
     stream.on("error", (streamError) => {
       res.status(500).json({

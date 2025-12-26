@@ -17,6 +17,7 @@
     "@zxing/library": "^0.21.3",
     "axios": "^1.11.0",
     "chartjs": "^0.3.24",
+    "erp-electron": "file:..",
     "fuse.js": "^7.1.0",
     "html5-qrcode": "^2.3.8",
     "i18next": "^25.2.1",
