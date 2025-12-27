@@ -67,7 +67,7 @@ export const Dashboard = () => {
               value: metricData?.totalSales,
             },
             {
-              label: t("stockCost"),
+              label: t("Ümumi Anbar Dəyəri"),
               value: metricData?.totalStockCost,
             },
           ]}

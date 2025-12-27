@@ -18,6 +18,14 @@ const Sales = sequelize.define(
       type: DataTypes.DECIMAL(10, 2), // 10 hane, 2 ondalık
       allowNull: false,
     },
+    discount: {
+      type: DataTypes.DECIMAL(5, 2), // İndirim yüzdesi
+      defaultValue: 0.0, // Varsayılan indirim %0
+    },
+    discounted_amount: {
+      type: DataTypes.DECIMAL(10, 2), // İndirimli tutar
+      defaultValue: 0.0,
+    },
     payment_method: {
       type: DataTypes.ENUM("cash", "card"), // Ödeme yöntemi: nakit, kart, kredi
       allowNull: false,

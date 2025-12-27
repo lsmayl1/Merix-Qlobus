@@ -28,6 +28,7 @@ const getSaleById = async (id) => {
       totalAmount: sale.total_amount,
       paymentMethod: sale.payment_method,
       date: moment(sale.date).tz("Asia/Dubai").format("DD-MM-YYYY HH:mm:ss"),
+      discountedAmount: sale.discounted_amount,
       details: sale.details.map((detail) => ({
         quantity: parseFloat(detail.quantity).toFixed(2),
         subtotal: detail.subtotal,

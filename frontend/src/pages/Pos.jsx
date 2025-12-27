@@ -81,6 +81,7 @@ export const Pos = () => {
     }),
   ];
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [discount, setDiscount] = useState(0);
   const [receivedAmount, setReceivedAmount] = useState(0);
   const [AmountToReturn, setAmountToReturn] = useState(0);
   const [postSale, { isLoading: postLoading }] = usePostSaleMutation();
@@ -255,11 +256,12 @@ export const Pos = () => {
         payment_method: paymentMethod,
         products: data?.items,
         type: type || "sale",
+        discount: discount,
       }).unwrap();
       setData([]);
       setInputData([]);
       setPaymentMethod("cash");
-
+      setDiscount(0);
       setTimeout(() => {
         barcodeRef.current?.focus();
       }, 100);
@@ -275,12 +277,15 @@ export const Pos = () => {
         return;
       }
 
-      const response = await postPreview({ items: inputData }).unwrap();
+      const response = await postPreview({
+        items: inputData,
+        discount: discount,
+      }).unwrap();
       setData(response); // response = { subtotal, total, items }
     };
 
     handlePreview();
-  }, [inputData]);
+  }, [inputData, discount]);
 
   useEffect(() => {
     if (receivedAmount && data.total) {
@@ -377,45 +382,36 @@ export const Pos = () => {
             </div>
           </div>
           {inputData.length > 0 && (
-            <div className="flex flex-col h-fit justify-center gap-4">
+            <div className="flex flex-col h-fit justify-center gap-1">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-medium">{t("total")}</span>
+                  <div className="flex gap-4 items-center ">
+                    <span className="text-2xl font-medium">{t("Endirim")}</span>
+                    <input
+                      type="number"
+                      className="border border-gray-200 w-12 rounded-lg py-1 px-2 text-center"
+                      value={discount}
+                      onChange={(e) =>
+                        setDiscount(Math.max(0, Math.min(100, e.target.value)))
+                      }
+                    />
+                    <span>%</span>
+                  </div>
+                  <span className="text-3xl font-medium">
+                    {data?.discountAmount || "0.00"} ₼
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-medium">
+                    {t("Yekun Məbləğ")}
+                  </span>
                   <span className="text-3xl font-medium">
                     {data?.total?.toFixed(2) || "0.00"} ₼
                   </span>
                 </div>
               </div>
               <div className="flex flex-col gap-2 ">
-                <div className="flex flex-col gap-2 border-mainBorder border rounded-lg w-full p-2 font-medium ">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-2 items-center">
-                      <h1>{t("receivedAmount")}</h1>{" "}
-                      <span className="bg-gray-100 rounded-full px-2  border border-mainBorder text-gray-400">
-                        /
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        className="text-xl text-right"
-                        step={0.01}
-                        ref={receivedInput}
-                        type="number"
-                        onChange={(e) =>
-                          setReceivedAmount(e.target.value.replace(",", "."))
-                        }
-                        value={receivedAmount}
-                      />
-                      <span> ₼</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <h1>{t("amountToReturn")}</h1>
-                    <span className="text-xl">
-                      {AmountToReturn.toFixed(2)} ₼
-                    </span>
-                  </div>
-                </div>
                 <div className="flex items-center gap-2 w-full">
                   <div className="flex gap-2 items-center w-full h-full">
                     <button
@@ -478,6 +474,36 @@ export const Pos = () => {
                     <span className="text-red-500">{t("Qaytarılma")}</span>
                   </button>
                 </div>
+                <div className="flex flex-col gap-2 border-mainBorder border rounded-lg w-full p-2 font-medium ">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-2 items-center">
+                      <h1>{t("receivedAmount")}</h1>{" "}
+                      <span className="bg-gray-100 rounded-full px-2  border border-mainBorder text-gray-400">
+                        /
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="text-xl text-right"
+                        step={0.01}
+                        ref={receivedInput}
+                        type="number"
+                        onChange={(e) =>
+                          setReceivedAmount(e.target.value.replace(",", "."))
+                        }
+                        value={receivedAmount}
+                      />
+                      <span> ₼</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <h1>{t("amountToReturn")}</h1>
+                    <span className="text-xl">
+                      {AmountToReturn.toFixed(2)} ₼
+                    </span>
+                  </div>
+                </div>
+
                 <div cname="flex items-center gap-2 w-full h-full">
                   <button
                     disabled={data.length == 0 || postLoading}

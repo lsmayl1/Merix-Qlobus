@@ -3,7 +3,7 @@ const { sequelize } = require("./models/index");
 async function resetDatabase() {
   try {
     // Veritabanını sıfırla ve tüm tabloları yeniden oluştur
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ alter: true });
     console.log("Veritabanı başarıyla sıfırlandı ve yeniden yapılandırıldı.");
   } catch (error) {
     console.error("Veritabanı sıfırlanırken bir hata oluştu:", error);

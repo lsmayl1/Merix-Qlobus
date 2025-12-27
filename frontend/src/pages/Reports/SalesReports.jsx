@@ -36,11 +36,11 @@ export const SalesReports = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const columns = [
-    columnHelper.accessor("sale_id", {
-      header: "ID",
-      headerClassName: "text-center rounded-s-lg bg-gray-100",
-      cellClassName: "text-center",
-    }),
+    // columnHelper.accessor("sale_id", {
+    //   header: "ID",
+    //   headerClassName: "text-center rounded-s-lg bg-gray-100",
+    //   cellClassName: "text-center",
+    // }),
     columnHelper.accessor("date", {
       header: t("date"),
       headerClassName: "text-center bg-gray-100",
@@ -48,6 +48,12 @@ export const SalesReports = () => {
     }),
     columnHelper.accessor("total_amount", {
       header: t("saleAmount"),
+      headerClassName: "text-center bg-gray-100",
+      cellClassName: "text-center",
+      cell: ({ getValue }) => <span>{getValue()} ₼</span>,
+    }),
+    columnHelper.accessor("discounted_amount", {
+      header: t("Endirim Məbləği"),
       headerClassName: "text-center bg-gray-100",
       cellClassName: "text-center",
       cell: ({ getValue }) => <span>{getValue()} ₼</span>,
@@ -189,8 +195,8 @@ export const SalesReports = () => {
             value: metrics.totalProfit || 0,
           },
           {
-            label: t("profitMargin"),
-            value: metrics.profitMargin || 0,
+            label: t("Maya Dəyəri"),
+            value: metrics.totalStockCost || 0,
           },
         ]}
       />

@@ -1,4 +1,5 @@
 const moment = require("moment");
+const { PrintReceipt } = require("../services/PrinterService");
 const {
   Sales,
   SalesDetails,
@@ -46,10 +47,24 @@ router.post("/", async (req, res) => {
     let cashTotal = 0;
     let cardTotal = 0;
     sales.forEach((sale) => {
+      const amount = Number(sale.total_amount);
+      const discounted_amount = Number(sale.discounted_amount);
+      const finalAmount = amount - discounted_amount;
+
       if (sale.payment_method === "cash") {
-        cashTotal += Number(sale.total_amount);
-      } else if (sale.payment_method === "card") {
-        cardTotal += Number(sale.total_amount);
+        if (sale.transaction_type === "sale") {
+          cashTotal += finalAmount;
+        } else if (sale.transaction_type === "return") {
+          cashTotal -= finalAmount;
+        }
+      }
+
+      if (sale.payment_method === "card") {
+        if (sale.transaction_type === "sale") {
+          cardTotal += finalAmount;
+        } else if (sale.transaction_type === "return") {
+          cardTotal -= finalAmount;
+        }
       }
     });
 
@@ -58,19 +73,33 @@ router.post("/", async (req, res) => {
       let profit = 0;
       if (Array.isArray(details)) {
         profit = details.reduce((sum, d) => {
-          if (Number(d.buy_price) === 0) return sum;
-          return (
-            sum +
-            (Number(d.sell_price) - Number(d.buy_price)) *
-              Number(d.quantity || 0)
-          );
+          if (sale.transaction_type === "return") {
+            return (
+              sum -
+              (Number(d.sell_price) - Number(d.buy_price)) *
+                Number(d.quantity || 0)
+            );
+          } else if (
+            sale.transaction_type === "sale" &&
+            sale.discount &&
+            sale.discount > 0
+          ) {
+            const discountRate = sale.discount / 100;
+            const discountedSellPrice =
+              Number(d.sell_price) * (1 - discountRate);
+            return (
+              sum +
+              (discountedSellPrice - Number(d.buy_price)) *
+                Number(d.quantity || 0)
+            );
+          } else {
+            return (
+              sum +
+              (Number(d.sell_price) - Number(d.buy_price)) *
+                Number(d.quantity || 0)
+            );
+          }
         }, 0);
-      } else if (details) {
-        if (Number(details.buy_price) !== 0) {
-          profit =
-            (Number(details.sell_price) - Number(details.buy_price)) *
-            Number(details.quantity || 0);
-        }
       }
 
       return {
@@ -135,7 +164,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/preview", async (req, res) => {
-  const { items } = req.body;
+  const { items, discount } = req.body;
   const resultItems = [];
 
   if (!items || !Array.isArray(items) || items.length === 0) {
@@ -214,13 +243,22 @@ router.post("/preview", async (req, res) => {
         subtotal,
       });
     }
+    let subtotal = resultItems.reduce((acc, item) => acc + item.subtotal, 0);
 
-    const subtotal = resultItems.reduce((sum, i) => sum + i.subtotal, 0);
+    let total = subtotal;
+    let discountAmount = 0;
+
+    if (discount && discount > 0) {
+      const discountRate = discount / 100;
+      discountAmount = parseFloat((subtotal * discountRate).toFixed(2));
+      total = parseFloat((subtotal - discountAmount).toFixed(2));
+    }
 
     res.json({
       subtotal,
-      total: subtotal,
+      total: total,
       items: resultItems,
+      discountAmount: discountAmount.toFixed(2),
     });
   } catch (error) {
     console.error("Preview error:", error.message);
@@ -231,7 +269,7 @@ router.post("/preview", async (req, res) => {
 // POST /sales
 router.post("/create", async (req, res) => {
   try {
-    const { products, payment_method, type } = req.body;
+    const { products, payment_method, type, discount } = req.body;
 
     if (!Array.isArray(products) || products.length === 0) {
       return res.status(400).json({ error: "Products array cannot be empty" });
@@ -296,12 +334,19 @@ router.post("/create", async (req, res) => {
       });
     }
 
+    const discountRate = discount ? discount / 100 : 0;
+    const discountedAmount = parseFloat(
+      (totalAmount * discountRate).toFixed(2)
+    );
+
     const result = await sequelize.transaction(async (t) => {
       const sale = await Sales.create(
         {
           total_amount: totalAmount,
           payment_method,
+          discount: discount || 0,
           transaction_type: type,
+          discounted_amount: discountedAmount,
         },
         { transaction: t }
       );
@@ -380,6 +425,17 @@ router.post("/create", async (req, res) => {
         })),
       },
     };
+    await PrintReceipt({
+      date: moment().tz("Asia/Dubai").format("DD-MM-YYYY HH:mm:ss"),
+      details: salesDetails.map((detail) => ({
+        name: detail.product_name,
+        quantity: detail.quantity,
+        sellPrice: detail.sell_price,
+        subtotal: detail.subtotal,
+      })),
+      totalAmount: totalAmount.toFixed(2),
+      discountAmount: discountedAmount.toFixed(2),
+    });
 
     await SyncQueue.create({
       entity: "sale",

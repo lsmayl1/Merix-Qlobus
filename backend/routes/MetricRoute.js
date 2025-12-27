@@ -36,40 +36,39 @@ router.post("/sale", async (req, res) => {
     let totalRevenue = 0;
     let totalProfit = 0;
     let totalSales = 0; // Satış sayı yalnız 'sale' üçün
+    let totalStockCost = 0;
 
     sales.forEach((sale) => {
       const isReturn = sale.transaction_type === "return";
 
-      if (sale.transaction_type === "sale") totalSales++;
+      if (!isReturn) totalSales++;
 
       if (Array.isArray(sale.details)) {
         sale.details.forEach((detail) => {
-          const revenue = Number(detail.sell_price) * Number(detail.quantity);
-          const profit =
-            (Number(detail.sell_price) - Number(detail.buy_price)) *
-            Number(detail.quantity);
+          const quantity = Number(detail.quantity);
+          const revenue = Number(detail.sell_price) * quantity;
+          const cost = Number(detail.buy_price) * quantity;
+          const profit = revenue - cost;
 
-          if (isReturn) {
-            totalRevenue -= revenue;
-            totalProfit -= profit;
-          } else {
-            totalRevenue += revenue;
-            totalProfit += profit;
-          }
+          const sign = isReturn ? -1 : 1;
+
+          totalRevenue += revenue * sign;
+          totalStockCost += cost * sign;
+          totalProfit += profit * sign;
         });
       }
+      if (!isReturn && sale.discounted_amount) {
+        const discount = Number(sale.discounted_amount);
+        totalRevenue -= discount;
+        totalProfit -= discount;
+      }
     });
-
-    const profitMargin =
-      totalRevenue !== 0
-        ? ((totalProfit / totalRevenue) * 100).toFixed(2) + " %"
-        : "0 %";
 
     res.json({
       totalRevenue: totalRevenue.toFixed(2) + " ₼",
       totalSales, // yalnız `sale` sayılır
       totalProfit: totalProfit.toFixed(2) + " ₼",
-      profitMargin,
+      totalStockCost: totalStockCost.toFixed(2) + " ₼",
     });
   } catch (err) {
     console.log(err);
@@ -202,27 +201,25 @@ router.post("/dashboard", async (req, res) => {
     sales.forEach((sale) => {
       const isReturn = sale.transaction_type === "return";
 
-      if (sale.transaction_type === "sale") totalSales++;
+      if (!isReturn) totalSales++;
 
       if (Array.isArray(sale.details)) {
         sale.details.forEach((detail) => {
-          const revenue = Number(detail.sell_price) * Number(detail.quantity);
-          let profit = 0;
+          const quantity = Number(detail.quantity);
+          const revenue = Number(detail.sell_price) * quantity;
+          const cost = Number(detail.buy_price) * quantity;
+          const profit = revenue - cost;
 
-          if (Number(detail.buy_price) !== 0) {
-            profit =
-              (Number(detail.sell_price) - Number(detail.buy_price)) *
-              Number(detail.quantity);
-          }
+          const sign = isReturn ? -1 : 1;
 
-          if (isReturn) {
-            totalRevenue -= revenue;
-            totalProfit -= profit;
-          } else {
-            totalRevenue += revenue;
-            totalProfit += profit;
-          }
+          totalRevenue += revenue * sign;
+          totalProfit += profit * sign;
         });
+      }
+      if (!isReturn && sale.discounted_amount) {
+        const discount = Number(sale.discounted_amount);
+        totalRevenue -= discount;
+        totalProfit -= discount;
       }
     });
 

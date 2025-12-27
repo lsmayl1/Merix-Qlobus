@@ -40,7 +40,7 @@ export const SaleDetailsModal = ({ saleId, handleClose }) => {
         <div className="flex justify-between pb-4 border-b border-mainBorder ">
           <div className="flex flex-col ">
             <h1 className="text-lg font-semibold text-mainText">Sale ID</h1>
-            <span className="text-lg  ">#{data?.saleId}</span>
+            <span className="text-lg  ">#{data?.saleId.slice(0, 15)}</span>
           </div>
           <div className="flex flex-col ">
             <h1 className="text-lg font-semibold text-end text-mainText">
