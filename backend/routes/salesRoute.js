@@ -425,14 +425,15 @@ router.post("/create", async (req, res) => {
         })),
       },
     };
-    await PrintReceipt({
+    PrintReceipt({
       date: moment().tz("Asia/Dubai").format("DD-MM-YYYY HH:mm:ss"),
       details: salesDetails.map((detail) => ({
         name: detail.product_name,
         quantity: detail.quantity,
         sellPrice: detail.sell_price,
-        subtotal: detail.subtotal,
+        subtotal: detail.subtotal.toFixed(2),
       })),
+      transactionType: type,
       totalAmount: totalAmount.toFixed(2),
       discountAmount: discountedAmount.toFixed(2),
     });

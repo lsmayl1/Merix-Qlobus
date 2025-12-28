@@ -29,12 +29,6 @@ dotenv.config({
 app.use(express.json()); // For parsing JSON requests
 app.use(cors());
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-// Sync the database
-
 const isDbConfigured =
   process.env.DB_HOST &&
   process.env.DB_USER &&
@@ -79,13 +73,6 @@ if (isDbConfigured) {
   app.use("/api/category", CategoryRoute);
 
   // startSyncWorker();
-
-  // // Tüm istekleri React dist klasörüne yönlendir
-  // app.get("*", (req, res) => {
-  //   res.sendFile(path.join(__dirname, "dist", "index.html"));
-  // });
-
-  // app.js ya da middlewares/errorHandler.js
 
   app.use((err, req, res, next) => {
     let statusCode = err.statusCode || 500;

@@ -31,7 +31,7 @@ router.post("/label-print", async (req, res) => {
 
     const mmToPt = (mm) => (mm / 25.4) * 72;
     const width = mmToPt(40);
-    const height = mmToPt(30);
+    const height = mmToPt(20);
 
     // Create temp directory if it doesn't exist
     const labelsDir = path.join(__dirname, "labels");
@@ -48,6 +48,9 @@ router.post("/label-print", async (req, res) => {
     });
 
     doc.registerFont("Inter", "./utils/fonts/Inter.ttf");
+    doc.registerFont("Inter-Bold", "./utils/fonts/Inter-Bold.ttf");
+    // Set font and size before measuring text so widthOfString matches rendering
+    doc.font("Inter-Bold").fontSize(6);
 
     function wrapTextByWidth(doc, text, maxWidth) {
       const words = text.split(" ");
@@ -62,7 +65,29 @@ router.post("/label-print", async (req, res) => {
           line = testLine;
         } else {
           if (line) lines.push(line);
-          line = word;
+
+          // If the single word is wider than maxWidth, split it into chunks
+          if (doc.widthOfString(word) > maxWidth) {
+            let chunk = "";
+            for (let i = 0; i < word.length; i++) {
+              const char = word[i];
+              const testChunk = chunk + char;
+              if (doc.widthOfString(testChunk) <= maxWidth) {
+                chunk = testChunk;
+              } else {
+                if (chunk) lines.push(chunk);
+                chunk = char;
+              }
+            }
+            if (chunk) {
+              // Start new current line with the last chunk (so following words can append)
+              line = chunk;
+            } else {
+              line = "";
+            }
+          } else {
+            line = word;
+          }
         }
       });
 
@@ -72,17 +97,19 @@ router.post("/label-print", async (req, res) => {
 
     // ...existing code...
     const productName = product.name || "Ürün Adı";
-    const maxTextWidth = width - 4; // kənarlardan boşluq
+
+    const leftMargin = 4; // small left margin for label text
+    const maxTextWidth = width - leftMargin * 2; // available width for text
     const nameLines = wrapTextByWidth(doc, productName, maxTextWidth);
 
     let currentY = 2;
 
-    doc.font("Inter").fontSize(6);
-
     nameLines.forEach((line) => {
-      const lineWidth = doc.widthOfString(line);
-      doc.text(line, (width - lineWidth) / 2, currentY);
-      currentY += 10; // sətirlər arası məsafə
+      doc.text(line, leftMargin, currentY, {
+        width: maxTextWidth,
+        align: "left",
+      });
+      currentY += 9; // sətirlər arası məsafə
     });
 
     doc.fontSize(9);
@@ -94,7 +121,7 @@ router.post("/label-print", async (req, res) => {
 
     // Barcode
     const barcodeBuffer = await generateBarcode(product.barcode);
-    const barcodeWidth = width * 0.8; // %80 genişlik
+    const barcodeWidth = width; // %80 genişlik
     const barcodeX = (width - barcodeWidth) / 2;
 
     const barcodeY = currentY + 18;
@@ -108,41 +135,42 @@ router.post("/label-print", async (req, res) => {
     doc.pipe(stream);
     doc.end();
 
-    stream.on("finish", async () => {
-      try {
-        // Print using pdf-to-printer with exact size settings
-        const options = {
-          printer: "Barkod", // Your thermal printer
-          pages: "1",
-          orientation: "landscape",
-          monochrome: false,
-          silent: true,
-          printDialog: false,
-          copies: 1,
-          // For thermal printers, these are the key settings:
-          paperSize: "Custom", // Use custom paper size
-        };
+    // stream.on("finish", async () => {
+    //   try {
+    //     // Print using pdf-to-printer with exact size settings
 
-        console.log("Printing with options:", options);
-        await pdf2printer.print(pdfPath, options);
+    //     const options = {
+    //       printer: "Barkod", // Your thermal printer
+    //       pages: "1",
+    //       orientation: "landscape",
+    //       monochrome: false,
+    //       silent: true,
+    //       printDialog: false,
+    //       copies: 1,
+    //       // For thermal printers, these are the key settings:
+    //       paperSize: "Custom", // Use custom paper size
+    //     };
 
-        // Clean up temp file
-        fs.unlinkSync(pdfPath);
+    //     console.log("Printing with options:", options);
+    //     await pdf2printer.print(pdfPath, options);
 
-        console.log("PDF printed successfully");
-        res.json({ success: true, message: "PDF printed successfully" });
-      } catch (printError) {
-        console.error("Print error:", printError);
-        // Clean up temp file even on error
-        if (fs.existsSync(pdfPath)) {
-          fs.unlinkSync(pdfPath);
-        }
-        res.status(500).json({
-          error: "Print failed",
-          details: printError.message,
-        });
-      }
-    });
+    //     // Clean up temp file
+    //     fs.unlinkSync(pdfPath);
+
+    //     console.log("PDF printed successfully");
+    //     res.json({ success: true, message: "PDF printed successfully" });
+    //   } catch (printError) {
+    //     console.error("Print error:", printError);
+    //     // Clean up temp file even on error
+    //     if (fs.existsSync(pdfPath)) {
+    //       fs.unlinkSync(pdfPath);
+    //     }
+    //     res.status(500).json({
+    //       error: "Print failed",
+    //       details: printError.message,
+    //     });
+    //   }
+    // });
 
     stream.on("error", (streamError) => {
       console.error("PDF creation error:", streamError);
@@ -164,7 +192,7 @@ router.get("/sale-receipt/:id", async (req, res, next) => {
   try {
     const sale = await getSaleById(req.params.id);
     if (!sale) return res.status(404).json({ error: "Sale not found" });
-    await PrintReceipt({
+    PrintReceipt({
       date: sale.date,
       details: sale.details,
       totalAmount: sale.totalAmount || 0,
@@ -176,33 +204,4 @@ router.get("/sale-receipt/:id", async (req, res, next) => {
   }
 });
 
-// Test route to check PDF dimensions
-router.get("/test-dimensions", (req, res) => {
-  const mmToPt = (mm) => (mm / 25.4) * 72;
-  const width = mmToPt(58.4);
-  const height = mmToPt(38.2);
-
-  res.json({
-    dimensions: {
-      points: { width: width, height: height },
-      mm: { width: 58.4, height: 38.2 },
-      inches: { width: 58.4 / 25.4, height: 38.2 / 25.4 },
-    },
-    message: "These are the exact dimensions your PDF will be printed at",
-  });
-});
-
-// Get available printers
-router.get("/printers", async (req, res) => {
-  try {
-    const printers = await pdf2printer.getPrinters();
-    res.json({ printers: printers });
-  } catch (error) {
-    console.error("Error getting printers:", error);
-    res.status(500).json({
-      error: "Could not get printers list",
-      details: error.message,
-    });
-  }
-});
 module.exports = router;

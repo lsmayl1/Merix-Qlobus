@@ -5,7 +5,8 @@ const path = require("path");
 
 const PrintReceipt = (data) => {
   try {
-    const { date, details, totalAmount, discountAmount } = data;
+    const { date, details, totalAmount, discountAmount, transactionType } =
+      data;
     const mmToPt = (mm) => (mm / 25.4) * 72;
     const width = mmToPt(75);
     const margin = 0;
@@ -72,7 +73,12 @@ const PrintReceipt = (data) => {
 
     const line = "*".repeat(42); // 80mm için ideal (58mm ise 32–36)
 
-    doc.fontSize(12).text("Satiş çeki", margin, currentY, {
+    let receiptType = "Satiş çeki";
+    if (transactionType === "return") {
+      receiptType = "Qaytarılma çeki";
+    }
+
+    doc.fontSize(12).text(receiptType, margin, currentY, {
       align: "center",
       width: width - 2 * margin,
     });
@@ -95,7 +101,7 @@ const PrintReceipt = (data) => {
     // === Table Header ===
     doc.fontSize(fontSize);
     doc.text("Məhsul", col.name, currentY);
-    doc.text("Qiymət", col.price - 46, currentY);
+    doc.text("Qiymət", col.price - 50, currentY);
     doc.text("Miqdar", col.qty - 36, currentY);
     doc.text("Məbləğ", col.total - 40, currentY);
     currentY += lineHeight + 4;
@@ -132,9 +138,9 @@ const PrintReceipt = (data) => {
           const priceWidth = doc.widthOfString(priceText);
           const totalWidth = doc.widthOfString(totalText);
 
-          doc.text(priceText, col.price - priceWidth - 10, itemStartY);
-          doc.text(qtyText, col.qty - qtyWidth - 10, itemStartY);
-          doc.text(totalText, col.total - totalWidth - 4, itemStartY);
+          doc.text(priceText, col.price - priceWidth - 15, itemStartY);
+          doc.text(qtyText, col.qty - qtyWidth - 8, itemStartY);
+          doc.text(totalText, col.total - totalWidth - 5, itemStartY);
         }
 
         currentY += lineHeight;
@@ -197,21 +203,21 @@ const PrintReceipt = (data) => {
         // Temizle
         fs.unlinkSync(tempPath);
 
-        res.json({ success: true, message: "Fiş yazıcıya gönderildi" });
+        return { success: true, message: "Fiş yazıcıya gönderildi" };
       } catch (printError) {
         if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-        res.status(500).json({
+        return {
           error: "Yazdırma başarısız",
           details: printError.message,
-        });
+        };
       }
     });
 
     stream.on("error", (streamError) => {
-      res.status(500).json({
+      return {
         error: "PDF oluşturulamadı",
         details: streamError.message,
-      });
+      };
     });
   } catch (error) {
     console.log("Print error" + error);
