@@ -332,14 +332,6 @@ export const Pos = () => {
       <ToastContainer />
 
       <div className="flex gap-4 items-center justify-between px-8 py-4">
-        <div className="flex gap-2 items-center ">
-          <button
-            onClick={handleDuplicateTab}
-            className="p-2  border border-mainBorder rounded-lg"
-          >
-            <Plus />
-          </button>
-        </div>
         <SearchModal
           data={searchData}
           setQuery={setQuery}
@@ -348,19 +340,8 @@ export const Pos = () => {
           handleAdd={handleChangeQtyAndFocus}
         />
         <div className="flex items-center gap-6">
-          <h1
-            onClick={() => setInputData([])}
-            className="text-red-500 cursor-pointer"
-          >
-            {" "}
-            {t("clearAll")}
-          </h1>
-          <NavLink to={"/reports/sale"}>
-            <ChartPie className="size-8" />
-          </NavLink>
-
           <NavLink to={"/"}>
-            <Logout className="size-8" />
+            <Logout className="size-8 text-gray-500" />
           </NavLink>
           <BarcodeField
             ref={barcodeRef}

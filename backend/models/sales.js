@@ -14,6 +14,11 @@ const Sales = sequelize.define(
       allowNull: false,
       defaultValue: DataTypes.NOW, // Varsayılan olarak şu anki tarih/saat
     },
+    subtotal_amount: {
+      type: DataTypes.DECIMAL(10, 2), // 10 hane, 2 ondalık
+      allowNull: false,
+      defaultValue: 0.0,
+    },
     total_amount: {
       type: DataTypes.DECIMAL(10, 2), // 10 hane, 2 ondalık
       allowNull: false,

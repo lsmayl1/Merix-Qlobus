@@ -49,21 +49,20 @@ router.post("/", async (req, res) => {
     sales.forEach((sale) => {
       const amount = Number(sale.total_amount);
       const discounted_amount = Number(sale.discounted_amount);
-      const finalAmount = amount - discounted_amount;
 
       if (sale.payment_method === "cash") {
         if (sale.transaction_type === "sale") {
-          cashTotal += finalAmount;
+          cashTotal += amount;
         } else if (sale.transaction_type === "return") {
-          cashTotal -= finalAmount;
+          cashTotal -= amount;
         }
       }
 
       if (sale.payment_method === "card") {
         if (sale.transaction_type === "sale") {
-          cardTotal += finalAmount;
+          cardTotal += amount;
         } else if (sale.transaction_type === "return") {
-          cardTotal -= finalAmount;
+          cardTotal -= amount;
         }
       }
     });
@@ -146,6 +145,10 @@ router.get("/:id", async (req, res) => {
       saleId: sale.sale_id,
       totalAmount: sale.total_amount + " ₼",
       paymentMethod: sale.payment_method,
+      transactionType: sale.transaction_type,
+      discount: sale.discount + " %",
+      discountedAmount: sale.discounted_amount + " ₼",
+      subtotalAmount: sale.subtotal_amount + " ₼",
       date: moment(sale.date).tz("Asia/Dubai").format("DD-MM-YYYY HH:mm:ss"),
       details: sale.details.map((detail) => ({
         quantity: detail.quantity,
@@ -289,6 +292,7 @@ router.post("/create", async (req, res) => {
     }
 
     let totalAmount = 0;
+    let subtotalAmount = 0;
     const salesDetails = [];
     const stockUpdates = [];
 
@@ -311,7 +315,7 @@ router.post("/create", async (req, res) => {
       }
 
       const subtotal = product.sellPrice * quantity;
-      totalAmount += subtotal;
+      subtotalAmount += subtotal;
 
       const newStock =
         type === "sale" ? product.stock - quantity : product.stock + quantity;
@@ -336,13 +340,15 @@ router.post("/create", async (req, res) => {
 
     const discountRate = discount ? discount / 100 : 0;
     const discountedAmount = parseFloat(
-      (totalAmount * discountRate).toFixed(2)
+      (subtotalAmount * discountRate).toFixed(2)
     );
+    totalAmount = parseFloat((subtotalAmount - discountedAmount).toFixed(2));
 
     const result = await sequelize.transaction(async (t) => {
       const sale = await Sales.create(
         {
           total_amount: totalAmount,
+          subtotal_amount: subtotalAmount,
           payment_method,
           discount: discount || 0,
           transaction_type: type,
@@ -438,14 +444,14 @@ router.post("/create", async (req, res) => {
       discountAmount: discountedAmount.toFixed(2),
     });
 
-    await SyncQueue.create({
-      entity: "sale",
-      record_id: result.sale_id,
-      action: "create",
-      payload: { products, payment_method, type, totalAmount },
-      record_id: result.sale_id,
-      status: "pending",
-    });
+    // await SyncQueue.create({
+    //   entity: "sale",
+    //   record_id: result.sale_id,
+    //   action: "create",
+    //   payload: { products, payment_method, type, totalAmount },
+    //   record_id: result.sale_id,
+    //   status: "pending",
+    // });
 
     return res.status(201).json(response);
   } catch (error) {

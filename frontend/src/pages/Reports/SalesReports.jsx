@@ -46,14 +46,20 @@ export const SalesReports = () => {
       headerClassName: "text-center bg-gray-100",
       cellClassName: "text-center",
     }),
-    columnHelper.accessor("total_amount", {
-      header: t("saleAmount"),
+    columnHelper.accessor("subtotal_amount", {
+      header: t("Aralıq məbləğ"),
       headerClassName: "text-center bg-gray-100",
       cellClassName: "text-center",
       cell: ({ getValue }) => <span>{getValue()} ₼</span>,
     }),
     columnHelper.accessor("discounted_amount", {
       header: t("Endirim Məbləği"),
+      headerClassName: "text-center bg-gray-100",
+      cellClassName: "text-center",
+      cell: ({ getValue }) => <span>{getValue()} ₼</span>,
+    }),
+    columnHelper.accessor("total_amount", {
+      header: t("Ümumi Məbləğ"),
       headerClassName: "text-center bg-gray-100",
       cellClassName: "text-center",
       cell: ({ getValue }) => <span>{getValue()} ₼</span>,

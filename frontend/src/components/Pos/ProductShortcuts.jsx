@@ -55,8 +55,8 @@ export const ProductShortcuts = ({
   const [identifiers, setIdentifiers] = useState(() => {
     try {
       const raw = localStorage.getItem("identifiers");
-      const data = raw && raw !== "undefined" ? JSON.parse(raw) : null;
-      return data;
+      const data = raw && raw !== "undefined" ? JSON.parse(raw) : [];
+      return data || [];
     } catch (err) {
       console.error("Invalid JSON in localStorage:", err);
       return [];
@@ -78,12 +78,22 @@ export const ProductShortcuts = ({
       }
     };
     handleData();
-  }, []);
+  }, [getShortCuts, identifiers]);
 
-  const deleteIdentifiers = async (id) => {
-    const updatedIds = identifiers.filter((x) => x != id);
+  const deleteIdentifiers = async (id, e) => {
+    e.stopPropagation();
+    const updatedIds = (identifiers || []).filter((x) => x != id);
+
+    // If there are no identifiers left, fully clear storage and shortcuts
+    if (!updatedIds || updatedIds.length === 0) {
+      setIdentifiers([]);
+      localStorage.removeItem("identifiers");
+      setShortCuts([]);
+      return;
+    }
+
     setIdentifiers(updatedIds);
-    localStorage.setItem("identifiers", JSON.stringify(updatedIds || []));
+    localStorage.setItem("identifiers", JSON.stringify(updatedIds));
     try {
       const data = await getShortCuts({ identifiers: updatedIds }).unwrap();
       setShortCuts(data);
@@ -161,9 +171,9 @@ export const ProductShortcuts = ({
                 setOpenContext(item.barcode);
               }
             }}
-            className={`flex cursor-pointer  flex-col relative px-4 py-2 justify-between  rounded-lg  border border-mainBorder ${
+            className={`flex cursor-pointer  flex-col relative px-4 py-2 rounded-lg justify-between   border border-mainBorder ${
               data?.find((x) => x.barcode == item.barcode)
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-600  text-white"
                 : "bg-white"
             }`}
           >
@@ -177,7 +187,7 @@ export const ProductShortcuts = ({
                 allign={"justify-end"}
                 className={
                   data?.find((x) => x.barcode == item.barcode)
-                    ? "bg-blue-600 text-white"
+                    ? "bg-blue-600 text-white "
                     : "bg-white"
                 }
               />
@@ -185,8 +195,8 @@ export const ProductShortcuts = ({
 
             {openContext === item.barcode && (
               <button
-                onClick={() => deleteIdentifiers(item.barcode)}
-                className="absolute w-full  h-full flex items-center justify-center right-0 top-0 rounded-lg bg-blur-xs bg-white gap-2"
+                onClick={(e) => deleteIdentifiers(item.barcode, e)}
+                className="absolute w-full border border-mainBorder  h-full flex items-center justify-center right-0 top-0  bg-blur-xs bg-white gap-2"
               >
                 <TrashBin className="size-8" />
                 <span className="text-xl text-black">{t("delete")}</span>
